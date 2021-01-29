@@ -1,4 +1,4 @@
-import { GetterTree, ActionTree, MutationTree } from "vuex";
+import { GetterTree, ActionTree, MutationTree, Plugin } from "vuex";
 import { Post } from "~/models/Post";
 import { User } from "~/models/User";
 import { AppStoreModule } from "~/utils/store-module";
@@ -14,30 +14,98 @@ export enum RootMutation {
 }
 
 export enum RootAction {
-  FETCH_ALL_POSTS = "fetchAllPosts"
+  SIGN_IN_WITH_EMAIL_AND_PASSWROD = "SIGN_IN_WITH_EMAIL_AND_PASSWROD",
+  SIGN_IN_WITH_FACEBOOK = "SIGN_IN_WITH_FACEBOOK",
+  SIGN_IN_WITH_GOOGLE = "SIGN_IN_WITH_GOOGLE",
+  SIGN_IN_WITH_GITHUB = "SIGN_IN_WITH_GITHUB",
+  FETCH_ALL_POSTS = "FETCH_ALL_POSTS",
+  ON_AUTH_STATE_CHANGED_ACTION = "ON_AUTH_STATE_CHANGED_ACTION"
 }
 
-const store: AppStoreModule<RootState, RootState> = {
-  state: () => ({
-    posts: [],
-    user: null
-  }),
+const state = (): RootState => ({
+  posts: [],
+  user: null
+});
 
-  mutations: {
-    [RootMutation.SET_USER]: (state, payload) => (state.user = payload),
+const mutations: MutationTree<RootState> = {
+  [RootMutation.SET_USER]: (state, payload) => (state.user = payload),
 
-    [RootMutation.SET_POSTS]: (state, payload) => (state.posts = payload)
+  [RootMutation.SET_POSTS]: (state, payload) => (state.posts = payload)
+};
+
+const actions: ActionTree<RootState, RootState> = {
+  // async nuxtServerInit({ dispatch, commit }, { req }) {
+  //   this.$fire.auth.onAuthStateChanged(
+  //     user => {
+  //       console.log("[Store] nuxtServerInit -> onAuthStateChanged", user);
+
+  //       commit(RootMutation.SET_USER, {
+  //         uid: user?.uid,
+  //         displayName: user?.displayName,
+  //         email: user?.email,
+  //         emailVerified: user?.emailVerified,
+  //         isAnonymous: user?.isAnonymous,
+  //         phoneNumber: user?.phoneNumber,
+  //         photoURL: user?.photoURL,
+  //         providerId: user?.providerId,
+  //         refreshToken: user?.refreshToken,
+  //         tenantId: user?.tenantId
+  //       });
+  //     },
+  //     error => {
+  //       console.log("[Store] nuxtServerInit -> error", error);
+  //     },
+  //     () => {
+  //       console.log("[Store] nuxtServerInit -> completed");
+  //     }
+  //   );
+  // },
+
+  async [RootAction.SIGN_IN_WITH_EMAIL_AND_PASSWROD](
+    { state, commit },
+    payload
+  ) {
+    try {
+      const userCredential = await this.$fire.auth.signInWithEmailAndPassword(
+        payload.email,
+        payload.password
+      );
+
+      const user = {
+        uid: userCredential.user?.uid,
+        displayName: userCredential.user?.displayName,
+        email: userCredential.user?.email,
+        emailVerified: userCredential.user?.emailVerified,
+        isAnonymous: userCredential.user?.isAnonymous,
+        phoneNumber: userCredential.user?.phoneNumber,
+        photoURL: userCredential.user?.photoURL,
+        providerId: userCredential.user?.providerId,
+        refreshToken: userCredential.user?.refreshToken,
+        tenantId: userCredential.user?.tenantId
+      };
+
+      commit(RootMutation.SET_USER, user);
+
+      return user;
+    } catch (error) {
+      console.log(error);
+      return error;
+    }
   },
 
-  actions: {
-    [RootAction.FETCH_ALL_POSTS](context) {
-      console.log(RootAction.FETCH_ALL_POSTS, context);
+  [RootAction.FETCH_ALL_POSTS](context) {
+    console.log(RootAction.FETCH_ALL_POSTS, context);
 
-      context.commit(RootMutation.SET_POSTS, []);
+    context.commit(RootMutation.SET_POSTS, []);
 
-      return "Awesome";
-    }
+    return "Awesome";
   }
 };
 
-export default store;
+export default {
+  state,
+
+  mutations,
+
+  actions
+};

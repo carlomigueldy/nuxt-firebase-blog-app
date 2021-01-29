@@ -1,15 +1,6 @@
 <template>
   <v-app>
-    <v-app-bar fixed app>
-      <!-- <v-app-bar-nav-icon @click.stop="drawer = !drawer" /> -->
-      <v-toolbar-title v-text="title" />
-      <v-spacer />
-    </v-app-bar>
-    <v-main>
-      <v-container>
-        <nuxt />
-      </v-container>
-    </v-main>
+    <nuxt />
   </v-app>
 </template>
 
