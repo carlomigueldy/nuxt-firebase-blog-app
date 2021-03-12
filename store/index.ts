@@ -34,32 +34,34 @@ const mutations: MutationTree<RootState> = {
 };
 
 const actions: ActionTree<RootState, RootState> = {
-  // async nuxtServerInit({ dispatch, commit }, { req }) {
-  //   this.$fire.auth.onAuthStateChanged(
-  //     user => {
-  //       console.log("[Store] nuxtServerInit -> onAuthStateChanged", user);
+  async nuxtServerInit({ dispatch, commit }, { req }) {
+    this.$fire.auth.onAuthStateChanged(
+      user => {
+        console.log("[Store] nuxtServerInit -> onAuthStateChanged", user);
 
-  //       commit(RootMutation.SET_USER, {
-  //         uid: user?.uid,
-  //         displayName: user?.displayName,
-  //         email: user?.email,
-  //         emailVerified: user?.emailVerified,
-  //         isAnonymous: user?.isAnonymous,
-  //         phoneNumber: user?.phoneNumber,
-  //         photoURL: user?.photoURL,
-  //         providerId: user?.providerId,
-  //         refreshToken: user?.refreshToken,
-  //         tenantId: user?.tenantId
-  //       });
-  //     },
-  //     error => {
-  //       console.log("[Store] nuxtServerInit -> error", error);
-  //     },
-  //     () => {
-  //       console.log("[Store] nuxtServerInit -> completed");
-  //     }
-  //   );
-  // },
+        if (user) {
+          commit(RootMutation.SET_USER, {
+            uid: user?.uid,
+            displayName: user?.displayName,
+            email: user?.email,
+            emailVerified: user?.emailVerified,
+            isAnonymous: user?.isAnonymous,
+            phoneNumber: user?.phoneNumber,
+            photoURL: user?.photoURL,
+            providerId: user?.providerId,
+            refreshToken: user?.refreshToken,
+            tenantId: user?.tenantId
+          });
+        }
+      },
+      error => {
+        console.log("[Store] nuxtServerInit -> error", error);
+      },
+      () => {
+        console.log("[Store] nuxtServerInit -> completed");
+      }
+    );
+  },
 
   async [RootAction.SIGN_IN_WITH_EMAIL_AND_PASSWROD](
     { state, commit },
@@ -71,20 +73,35 @@ const actions: ActionTree<RootState, RootState> = {
         payload.password
       );
 
-      const user = {
-        uid: userCredential.user?.uid,
-        displayName: userCredential.user?.displayName,
-        email: userCredential.user?.email,
-        emailVerified: userCredential.user?.emailVerified,
-        isAnonymous: userCredential.user?.isAnonymous,
-        phoneNumber: userCredential.user?.phoneNumber,
-        photoURL: userCredential.user?.photoURL,
-        providerId: userCredential.user?.providerId,
-        refreshToken: userCredential.user?.refreshToken,
-        tenantId: userCredential.user?.tenantId
-      };
+      const user = userCredential?.user;
 
-      commit(RootMutation.SET_USER, user);
+      if (user) {
+        const {
+          uid,
+          displayName,
+          email,
+          emailVerified,
+          isAnonymous,
+          phoneNumber,
+          photoURL,
+          providerId,
+          refreshToken,
+          tenantId
+        } = user;
+
+        commit(RootMutation.SET_USER, {
+          uid,
+          displayName,
+          email,
+          emailVerified,
+          isAnonymous,
+          phoneNumber,
+          photoURL,
+          providerId,
+          refreshToken,
+          tenantId
+        });
+      }
 
       return user;
     } catch (error) {

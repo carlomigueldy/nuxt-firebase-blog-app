@@ -19,7 +19,7 @@ export default defineNuxtMiddleware(async context => {
         tenantId: user?.tenantId
       });
 
-      if (!context.store?.state?.user?.uid) context.redirect(401, "/");
+      if (!context.store?.state?.user?.uid) return context.redirect(401, "/");
     },
     error => {
       console.log("[AuthMiddleware] error", error);

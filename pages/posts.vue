@@ -33,7 +33,7 @@ export default defineComponent({
     function signOut() {
       context.$fire.auth.signOut();
       context.store.commit(RootMutation.SET_USER, null);
-      context.app.router?.push({ name: "index" });
+      // context.app.router?.push({ name: "index" });
     }
 
     return {
